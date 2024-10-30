@@ -1,0 +1,168 @@
+version: 2
+
+models:
+  - name: customers
+    description: "Table containing customer information."
+    columns:
+      - name: customer_id
+        description: "Unique identifier for each customer."
+        tests:
+          - not_null
+          - unique
+      - name: first_name
+        description: "Customer's first name."
+      - name: last_name
+        description: "Customer's last name."
+      - name: email
+        description: "Customer's email address."
+        tests:
+          - not_null
+          - unique
+
+  - name: orders
+    description: "Table containing order information."
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order."
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "Customer identifier linked to the customers table."
+        tests:
+          - relationships:
+              to: ref('customers')
+              field: customer_id
+      - name: order_date
+        description: "Date the order was placed."
+      - name: total_amount
+        description: "Total amount for the order."
+        tests:
+          - not_null
+
+  - name: products
+    description: "Table containing product information."
+    columns:
+      - name: product_id
+        description: "Unique identifier for each product."
+        tests:
+          - not_null
+          - unique
+      - name: product_name
+        description: "Name of the product."
+      - name: category
+        description: "Category of the product."
+
+  - name: inventory
+    description: "Table containing product inventory details."
+    columns:
+      - name: product_id
+        description: "Identifier linking to products table."
+        tests:
+          - relationships:
+              to: ref('products')
+              field: product_id
+      - name: quantity_in_stock
+        description: "Current quantity in stock for each product."
+
+  - name: suppliers
+    description: "Table containing supplier information."
+    columns:
+      - name: supplier_id
+        description: "Unique identifier for each supplier."
+        tests:
+          - not_null
+          - unique
+      - name: supplier_name
+        description: "Name of the supplier."
+      - name: contact_email
+        description: "Email address of the supplier's contact person."
+
+  - name: sales
+    description: "Table containing details of each sale."
+    columns:
+      - name: sale_id
+        description: "Unique identifier for each sale."
+        tests:
+          - not_null
+          - unique
+      - name: product_id
+        description: "Identifier linking to products table."
+        tests:
+          - relationships:
+              to: ref('products')
+              field: product_id
+      - name: quantity_sold
+        description: "Number of units sold in this sale."
+      - name: sale_date
+        description: "Date of sale."
+
+  - name: employees
+    description: "Table containing employee information."
+    columns:
+      - name: employee_id
+        description: "Unique identifier for each employee."
+        tests:
+          - not_null
+          - unique
+      - name: first_name
+        description: "Employee's first name."
+      - name: last_name
+        description: "Employee's last name."
+      - name: position
+        description: "Job position of the employee."
+
+  - name: regions
+    description: "Table containing information about sales regions."
+    columns:
+      - name: region_id
+        description: "Unique identifier for each sales region."
+        tests:
+          - not_null
+          - unique
+      - name: region_name
+        description: "Name of the sales region."
+      - name: manager_id
+        description: "Identifier linking to employees table."
+        tests:
+          - relationships:
+              to: ref('employees')
+              field: employee_id
+
+  - name: customer_feedback
+    description: "Table containing feedback provided by customers."
+    columns:
+      - name: feedback_id
+        description: "Unique identifier for each feedback entry."
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "Identifier linking to customers table."
+        tests:
+          - relationships:
+              to: ref('customers')
+              field: customer_id
+      - name: feedback_text
+        description: "Text of the feedback provided by the customer."
+      - name: feedback_date
+        description: "Date the feedback was provided."
+
+  - name: shipping
+    description: "Table containing shipping information for orders."
+    columns:
+      - name: shipping_id
+        description: "Unique identifier for each shipping record."
+        tests:
+          - not_null
+          - unique
+      - name: order_id
+        description: "Identifier linking to orders table."
+        tests:
+          - relationships:
+              to: ref('orders')
+              field: order_id
+      - name: shipping_date
+        description: "Date the order was shipped."
+      - name: delivery_date
+        description: "Expected or actual delivery date."
