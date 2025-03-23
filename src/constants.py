@@ -1,13 +1,18 @@
 import os
 
 # DBT Variables Access
-DBT_API_TOKEN = 'your_dbt_api_token_here'
-ACCOUNT_ID = 'your_account_id_here'
-PROJECT_ID = 'your_project_id_here'
+dbt_token = os.getenv("DBT_API_TOKEN")
+dbt_account = os.getenv("ACCOUNT_ID")
+dbt_project = os.getenv("PROJECT_ID")
 
 # Claude credentials
-CLAUDE_API_TOKEN = 'claude_api_token'
-CLAUDE_API_URL = "https://api.anthropic.com/v1/complete"
+claude_token = os.getenv("CLAUDE_API_TOKEN")
+claude_url = os.getenv("CLAUDE_API_URL")
 
 # Slack Variables
-CLIENT_ID = "1657288434915.8091739295108"
+slack_client = os.getenv("CLIENT_ID")
+
+# Prompt of our agent
+prompt = """
+You are a helpful assistant that can answer questions and help with tasks.
+"""

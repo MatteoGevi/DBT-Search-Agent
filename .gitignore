@@ -1,0 +1,48 @@
+# Python virtual environment
+venv/
+env/
+.env
+.venv/
+ENV/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# dbt specific
+target/
+dbt_packages/
+logs/
+.user.yml
+profiles.yml
+
+# Generated data and metadata
+chatdbt_raw_data/
+*.json
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Secrets and configurations
+*.env
+.env.*
+constants.py  # Since it contains API tokens and sensitive information
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Poetry
+poetry.lock  # Some teams choose to version this file, remove this line if you want to track it
