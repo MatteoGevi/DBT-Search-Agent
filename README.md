@@ -5,21 +5,43 @@
 [![Slack](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white)](https://slack.com)
 [![Microsoft Teams](https://img.shields.io/badge/Microsoft_Teams-6264A7?style=for-the-badge&logo=microsoft-teams&logoColor=white)](https://teams.microsoft.com)
 [![Google Chat](https://img.shields.io/badge/Google%20Chat-00AC47?style=for-the-badge&logo=google-chat&logoColor=white)](https://workspace.google.com/products/chat/)
+[![Python](https://img.shields.io/badge/python-3.11-blue.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
+[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-A chatbot that helps users understand and query dbt models across multiple messaging platforms (Slack, Microsoft Teams, and Google Chat).
+A chatbot that helps users understand and query dbt models across multiple messaging platforms using native platform integrations.
 
 ## Features
 
-- Query dbt model descriptions
-- Get column information
-- View model relationships
-- Multi-platform support (Slack, MS Teams, Google Chat)
+- Query dbt model descriptions and metadata
+- Get column information and lineage
+- View model relationships and dependencies
+- Multi-platform support:
+  - Slack (using slack-sdk)
+  - Microsoft Teams (using microsoft-teams-sdk)
+  - Google Chat (using google-cloud-pubsub)
+
+## Architecture
+
+```
+DBT-Search-Agent/
+├── src/
+│   ├── bot/           # Platform-specific bot implementations
+│   ├── config/        # Configuration management
+│   ├── actions/       # Query handling and responses
+│   └── main.py        # Application entry point
+├── models/            # Your dbt models
+└── docker/            # Containerization
+```
 
 ## Prerequisites
 
+- Python 3.11+
 - Docker and Docker Compose
 - dbt Cloud account
-- Messaging platform credentials (Slack/Teams/Google Chat)
+- Platform-specific credentials:
+  - Slack Bot Token
+  - Microsoft Teams App credentials
+  - Google Chat API credentials
 
 ## Local Development
 
@@ -28,127 +50,122 @@ A chatbot that helps users understand and query dbt models across multiple messa
 poetry install
 ```
 
-2. Set up environment variables in `.env`:
+2. Set up environment variables:
 ```bash
-# Copy the example env file
 cp .env.example .env
-# Edit with your credentials
+# Edit .env with your platform credentials
 ```
 
-3. Train the model:
+3. Run locally:
 ```bash
-rasa train
-```
-
-4. Run locally:
-```bash
-# Terminal 1: Run the Rasa server
-rasa run --enable-api --cors "*"
-
-# Terminal 2: Run the actions server
-rasa run actions
+python -m src.main
 ```
 
 ## Production Deployment
 
-### 1. Cloud Platform Setup
+### 1. Build the Container
 
-Choose one of the following platforms:
+```bash
+docker build -t dbt-search-bot .
+```
+
+### 2. Deploy to Cloud Platform
+
+Choose your preferred platform:
 
 #### Option A: Google Cloud Run
-1. Install Google Cloud SDK
-2. Create a new project
-3. Enable Cloud Run API
-4. Set up Google Cloud credentials
-
 ```bash
 # Initialize Google Cloud
 gcloud init
-# Build and push containers
-gcloud builds submit --tag gcr.io/[PROJECT_ID]/rasa-bot
-gcloud builds submit --tag gcr.io/[PROJECT_ID]/rasa-actions
+
+# Deploy container
+gcloud run deploy dbt-search-bot \
+  --image dbt-search-bot \
+  --platform managed \
+  --allow-unauthenticated
 ```
 
-#### Option B: AWS Elastic Beanstalk
-1. Install AWS CLI
-2. Create an Elastic Beanstalk application
-3. Configure environment variables in EB console
-
-### 2. Deploy Using Docker
-
-1. Build the images:
+#### Option B: AWS ECS
 ```bash
-docker-compose build
+# Configure AWS CLI
+aws configure
+
+# Create ECR repository
+aws ecr create-repository --repository-name dbt-search-bot
+
+# Push and deploy
+aws ecs create-service ...
 ```
 
-2. Push to your container registry:
-```bash
-docker-compose push
-```
-
-3. Deploy to your chosen platform using the provided Dockerfiles and docker-compose.yml
-
-### 3. Messaging Platform Setup
+### 3. Platform-Specific Setup
 
 #### Slack
-1. Create a Slack App at api.slack.com
-2. Add Bot Token Scopes:
+1. Create app at api.slack.com
+2. Add scopes:
    - chat:write
    - im:history
    - im:read
    - im:write
-3. Install app to workspace
-4. Copy Bot User OAuth Token to .env
+3. Install to workspace
+4. Add token to .env
 
 #### Microsoft Teams
-1. Register app in Azure Active Directory
-2. Create a bot channel
-3. Configure messaging endpoint
-4. Add app to Teams
+1. Register in Azure AD
+2. Create bot channel
+3. Configure webhook URL
+4. Add to Teams
 
 #### Google Chat
-1. Create project in Google Cloud Console
-2. Enable Chat API
-3. Configure bot settings
-4. Download credentials JSON
+1. Enable Chat API
+2. Configure bot
+3. Set up pub/sub
 
 ## Environment Variables
 
-Required environment variables:
-```
+```bash
 # Slack
-SLACK_TOKEN=your_token
-SLACK_CHANNEL=your_channel
-SLACK_SIGNING_SECRET=your_secret
+SLACK_TOKEN=xxx
+SLACK_SIGNING_SECRET=xxx
+CLIENT_ID=xxx
 
 # Microsoft Teams
-TEAMS_APP_ID=your_app_id
-TEAMS_APP_PASSWORD=your_password
+TEAMS_APP_ID=xxx
+TEAMS_APP_PASSWORD=xxx
 
 # Google Chat
-GOOGLE_CLOUD_PROJECT=your_project_id
-GOOGLE_APPLICATION_CREDENTIALS=path_to_credentials.json
+GOOGLE_CLOUD_PROJECT=xxx
+GOOGLE_APPLICATION_CREDENTIALS=xxx
 
-# DBT
-DBT_API_TOKEN=your_dbt_api_token
-ACCOUNT_ID=your_account_id
-PROJECT_ID=your_project_id
+# DBT Cloud
+DBT_API_TOKEN=xxx
+ACCOUNT_ID=xxx
+PROJECT_ID=xxx
 ```
 
-## Maintenance
+## How It Works
 
-- Regularly update the model with new training data
-- Monitor bot performance and errors
-- Keep dependencies updated
-- Backup model files and configurations
+1. **Metadata Extraction**:
+   - Connects to dbt Cloud API
+   - Extracts model definitions, relationships, and documentation
+   - Caches metadata for quick responses
+
+2. **Query Processing**:
+   - Receives messages from any configured platform
+   - Processes natural language queries
+   - Returns relevant dbt metadata
+
+3. **Platform Integration**:
+   - Uses native SDKs for each platform
+   - Maintains persistent connections
+   - Handles platform-specific message formats
 
 ## Security Considerations
 
-- All credentials should be stored as environment variables
-- Use secure HTTPS endpoints
-- Regularly rotate API keys
-- Implement rate limiting
-- Monitor for suspicious activities
+- All credentials stored as environment variables
+- HTTPS endpoints required
+- Regular API key rotation
+- Rate limiting implemented
+- Activity monitoring
 
 ## Support
 
