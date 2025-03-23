@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  rasa:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5005:5005"
+    depends_on:
+      - "rasa-actions"
+    environment:
+      - SLACK_TOKEN=${SLACK_TOKEN}
+      - SLACK_CHANNEL=${SLACK_CHANNEL}
+      - SLACK_SIGNING_SECRET=${SLACK_SIGNING_SECRET}
+      - TEAMS_APP_ID=${TEAMS_APP_ID}
+      - TEAMS_APP_PASSWORD=${TEAMS_APP_PASSWORD}
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/google-credentials.json
+      - DBT_API_TOKEN=${DBT_API_TOKEN}
+      - ACCOUNT_ID=${ACCOUNT_ID}
+      - PROJECT_ID=${PROJECT_ID}
+    volumes:
+      - ./models:/app/models
+      - ./google-credentials.json:/app/google-credentials.json:ro
+
+  rasa-actions:
+    build:
+      context: .
+      dockerfile: Dockerfile.actions
+    ports:
+      - "5055:5055"
+    environment:
+      - DBT_API_TOKEN=${DBT_API_TOKEN}
+      - ACCOUNT_ID=${ACCOUNT_ID}
+      - PROJECT_ID=${PROJECT_ID}
+    volumes:
+      - ./actions:/app/actions 
