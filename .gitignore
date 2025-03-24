@@ -4,6 +4,7 @@ env/
 .env
 .venv/
 ENV/
+dbt_env/
 
 # Python cache files
 __pycache__/
