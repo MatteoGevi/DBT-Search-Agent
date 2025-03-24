@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Matteo Gevi <matteogevi97@gmail.com>"]
 readme = "README.md"
+packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -16,14 +17,7 @@ dbt-core = "^1.8.8"
 dbt-postgres = "^1.8.2"
 ngrok = "^1.4.0"
 pyyaml = "^6.0.2"
-rasa = "^3.6.15"
-rasa-sdk = "^3.6.2"
-# Channel connectors
-rasa-x = "^1.1.0"  # Optional: for better model management
-python-telegram-bot = "^20.8"  # For Telegram
-slack-bolt = "^1.18.1"  # For Slack
-microsoftteams = "^0.3.0"  # For Microsoft Teams
-google-cloud-pubsub = "^2.19.0"  # For Google Chat
+python-dotenv = "^1.0.1"
 
 [build-system]
 requires = ["poetry-core"]
